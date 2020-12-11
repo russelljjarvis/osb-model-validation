@@ -35,7 +35,7 @@ class NumbaEngine(OMVEngine):
         #install_pynn
         home = os.environ['HOME']
         inform('Will fetch and install the latest numba', indent=2)
-        install_numbal()
+        install_numba()
         inform('Done, numba is correctly installed...', indent=2)
 
 
