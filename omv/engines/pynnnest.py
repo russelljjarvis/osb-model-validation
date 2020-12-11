@@ -1,11 +1,12 @@
 import os
 import subprocess as sp
 
-from nestsli import NestEngine
-from pynn import PyNNEngine
+from omv.engines.nestsli import NestEngine
+from omv.engines.pynest import PyNestEngine
+from omv.engines.pynn import PyNNEngine
 
-from ..common.inout import inform, trim_path, check_output, is_verbose
-from engine import EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output, is_verbose
+from omv.engines.engine import EngineExecutionError
 
 
 class PyNNNestEngine(PyNNEngine):
@@ -17,13 +18,13 @@ class PyNNNestEngine(PyNNEngine):
         if is_verbose():
             inform("Checking whether %s is installed..." %
                    PyNNNestEngine.name, indent=1)
-        return PyNNEngine.is_installed(None) and NestEngine.is_installed(None)
+        return PyNNEngine.is_installed(None) and PyNestEngine.is_installed(None)
         
     @staticmethod
     def install(version):
-        if not NestEngine.is_installed(None):
-            NestEngine.install(None)
-            inform("%s installed Nest..." % PyNNNestEngine.name, indent=2, verbosity =1)
+        if not PyNestEngine.is_installed(None):
+            PyNestEngine.install(version)  # interpret version as version of NEST!
+            inform("%s installed PyNest..." % PyNNNestEngine.name, indent=2, verbosity =1)
         if not PyNNEngine.is_installed(None):
             PyNNEngine.install(None)
             inform("%s installed PyNN..." % PyNNNestEngine.name, indent=2, verbosity =1)
@@ -38,7 +39,7 @@ class PyNNNestEngine(PyNNEngine):
 
             inform("Env vars: %s" % self.environment_vars, indent=2)
         
-            inform("Running file %s with %s" % (trim_path(self.modelpath), self.name), indent=1)
+            inform("Running a file %s with %s" % (trim_path(self.modelpath), self.name), indent=1)
             self.stdout = check_output(['python', self.modelpath, 'nest'],
                                           cwd=os.path.dirname(self.modelpath))
             self.returncode = 0

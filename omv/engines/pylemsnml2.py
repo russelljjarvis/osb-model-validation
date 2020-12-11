@@ -1,11 +1,11 @@
 import os
 import subprocess as sp
 
-from pylems import PyLemsEngine
-from getnml2 import default_nml2_dir, install_nml2
+from omv.engines.pylems import PyLemsEngine
+from omv.engines.getnml2 import default_nml2_dir, install_nml2
 
-from ..common.inout import inform, trim_path, is_verbose
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, is_verbose
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
 
 class PyLemsNeuroML2Engine(OMVEngine):
@@ -21,7 +21,10 @@ class PyLemsNeuroML2Engine(OMVEngine):
                
         nml2_installed = os.path.isdir(default_nml2_dir)
                
-        return PyLemsEngine.is_installed(None) and nml2_installed
+        if nml2_installed and PyLemsEngine.is_installed(None):
+            return PyLemsEngine.is_installed(None)
+        else:
+            return False
         
     def install(self, version):
         

@@ -1,8 +1,8 @@
 import os
 import subprocess as sp
 
-from jneuroml import JNeuroMLEngine, EngineExecutionError
-from ..common.inout import inform
+from omv.engines.jneuroml import JNeuroMLEngine, EngineExecutionError
+from omv.common.inout import inform, check_output
 
 # Make explicit list from: '*.nml myfile.xml' etc.
 def resolve_paths(path_s):
@@ -43,21 +43,22 @@ class JNeuroMLValidateEngine(JNeuroMLEngine):
         try:
             path_s = resolve_paths(self.modelpath)
                 
-            cmds = ['jnml' if os.name != 'nt' else 'jnml.bat', '-validate']
+            from omv.engines.jneuroml import JNeuroMLEngine
+            jnml = JNeuroMLEngine.get_executable()
+            cmds = [jnml, '-validate']
             for p in path_s: cmds.append(p)
             
             inform("Running with %s, using %s..." % (JNeuroMLValidateEngine.name,
                    cmds),
                    indent=1)
-            self.stdout = sp.check_output(cmds,
-                cwd=os.path.dirname(self.modelpath))
+            self.stdout = check_output(cmds,
+                cwd=os.path.dirname(self.modelpath),
+                env=JNeuroMLEngine.get_environment())
             inform("Success with running ", JNeuroMLValidateEngine.name,
                    indent=1, verbosity=1)
             self.returncode = 0
         except sp.CalledProcessError as err:
             inform("Error with ",  JNeuroMLValidateEngine.name,
-                   indent=1, verbosity=1)
-            inform(err.output.replace('\n', '\n  >   '),  '',
                    indent=1, verbosity=1)
             self.returncode = err.returncode
             self.stdout = err.output

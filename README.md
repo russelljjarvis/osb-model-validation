@@ -1,27 +1,41 @@
-[![Build Status](https://travis-ci.org/OpenSourceBrain/osb-model-validation.svg?branch=master)](https://travis-ci.org/OpenSourceBrain/osb-model-validation)
+[![Build Status](https://travis-ci.com/OpenSourceBrain/osb-model-validation.svg?branch=master)](https://travis-ci.com/OpenSourceBrain/osb-model-validation)
 ------------------------------------------
 
 
 OSB Model Validation
 ====================
 
-Tools for automated model validation in [Open Source Brain](http://www.opensourcebrain.org) projects, but which can be used for testing model behaviour on many simulation engines, both locally and on [Travis-CI](https://travis-ci.org).
+Tools for automated model validation in [Open Source Brain](http://www.opensourcebrain.org) projects, but which can be used for testing model behaviour on many simulation engines, both locally and on [Travis-CI](https://travis-ci.com).
 
 To see this framework in action, click on some of the green buttons below:   
 
 |  OSB project   |   Tests on Travis-CI    |  .travis.yml script |
 |----------|:-------------:|:------:|
-|[FitzHugh Nagumo](http://www.opensourcebrain.org/projects/fitzhugh-nagumo-fitzhugh-1969) | [![Build Status](https://travis-ci.org/OpenSourceBrain/FitzHugh-Nagumo.svg?branch=master)](https://travis-ci.org/OpenSourceBrain/FitzHugh-Nagumo) | [.travis.yml](https://github.com/borismarin/FitzHugh-Nagumo/blob/master/.travis.yml) |
-|[Auditory cortex network](http://www.opensourcebrain.org/projects/acnet2)|[![Build Status](https://travis-ci.org/OpenSourceBrain/ACnet2.svg?branch=master)](https://travis-ci.org/OpenSourceBrain/ACnet2)|[.travis.yml](https://github.com/OpenSourceBrain/ACnet2/blob/master/.travis.yml)|
-| [SBML Showcase](http://www.opensourcebrain.org/projects/sbmlshowcase) | [![Build Status](https://travis-ci.org/OpenSourceBrain/SBMLShowcase.svg?branch=master)](https://travis-ci.org/OpenSourceBrain/SBMLShowcase) | [.travis.yml](https://github.com/OpenSourceBrain/SBMLShowcase/blob/master/.travis.yml)|
+|[FitzHugh Nagumo](http://www.opensourcebrain.org/projects/fitzhugh-nagumo-fitzhugh-1969) | [![Build Status](https://travis-ci.com/OpenSourceBrain/FitzHugh-Nagumo.svg?branch=master)](https://travis-ci.com/OpenSourceBrain/FitzHugh-Nagumo) | [.travis.yml](https://github.com/borismarin/FitzHugh-Nagumo/blob/master/.travis.yml) |
+|[Auditory cortex network](http://www.opensourcebrain.org/projects/acnet2)|[![Build Status](https://travis-ci.com/OpenSourceBrain/ACnet2.svg?branch=master)](https://travis-ci.com/OpenSourceBrain/ACnet2)|[.travis.yml](https://github.com/OpenSourceBrain/ACnet2/blob/master/.travis.yml)|
+| [SBML Showcase](http://www.opensourcebrain.org/projects/sbmlshowcase) | [![Build Status](https://travis-ci.com/OpenSourceBrain/SBMLShowcase.svg?branch=master)](https://travis-ci.com/OpenSourceBrain/SBMLShowcase) | [.travis.yml](https://github.com/OpenSourceBrain/SBMLShowcase/blob/master/.travis.yml)|
 
+This framework has been used to test the 25+ NeuroML and PyNN models described in the [Open Source Brain paper (Gleeson et al. 2019)](https://www.cell.com/neuron/fulltext/S0896-6273(19)30444-1). 
+
+Installation
+------------
+
+Quick install:
+ 
+    sudo pip install git+https://github.com/OpenSourceBrain/osb-model-validation
+    
+Install from cloned repository:
+
+    git clone https://github.com/OpenSourceBrain/osb-model-validation.git
+    cd osb-model-validation
+    sudo python setup.py install 
 
 Instructions
 ------------
 
-Any _OSB_ project can have automated testing incorporated (currently,
-only _LEMS_ and _NEURON_ implementations can be tested thoroughly,
-though). In order to enable it:
+Any _OSB_ project can have automated testing incorporated. For an overview of the various OSB projects with OMV tests, see https://travis-ci.org/OpenSourceBrain (note not all of these use OMV yet).
+
+In order to enable it:
 
 - create a dry-run <b>O</b>SB <b>M</b>odel <b>T</b>est (_omt_) file, containing the
   target model file and the simulator, e.g.
@@ -39,7 +53,7 @@ though). In order to enable it:
 
 Once these changes are pushed to the _github_ repo, travis will run
 the tests automatically. You can check the results at
-http://travis-ci.org/OpenSourceBrain/project_name (and ideally add a
+http://travis-ci.com/OpenSourceBrain/project_name (and ideally add a
 travis build badge to the projects' Readme.md file). Check 
 [this project](https://github.com/borismarin/hh-testing) for a working example. 
 

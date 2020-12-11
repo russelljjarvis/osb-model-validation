@@ -1,13 +1,14 @@
 
 import subprocess as sp
 from textwrap import dedent
-from utils.wdir import working_dir
+from omv.engines.utils.wdir import working_dir
 from os.path import dirname
+import sys
 
-from neuron import NeuronEngine
+from omv.engines.neuron_ import NeuronEngine
 
-from ..common.inout import inform, is_verbose
-from engine import EngineExecutionError
+from omv.common.inout import inform, is_verbose, check_output
+from omv.engines.engine import EngineExecutionError
 
 
 class PyNRNEngine(NeuronEngine):
@@ -16,17 +17,29 @@ class PyNRNEngine(NeuronEngine):
 
     @staticmethod
     def is_installed(version):
-        if is_verbose():
-            inform("Checking whether %s is installed correctly..." %
-                   PyNRNEngine.name, indent=1)
-        installed = NeuronEngine.is_installed(None)
-        
-        return installed
+        ret = True
+        try:
+            inform("Checking whether %s is installed..." % PyNRNEngine.name, indent=1, verbosity=2)
+            
+            ### Prints to stderr!!
+            #ret_str = check_output(['python -c "import neuron; print(neuron.h.nrnversion())"'], shell=True, verbosity=2)
+            import neuron
+            ret_str = neuron.h.nrnversion()
+            
+            ret = 'v%s'%ret_str.split()[3]
+            if is_verbose():
+                inform("PyNEURON version %s is correctly installed..." % ret, indent=2)
+                
+            
+        except Exception as err: 
+            inform("Couldn't import NEURON into Python: ", err, indent=1)
+            ret = False
+        return ret
         
     @staticmethod
     def install(version):
         if not NeuronEngine.is_installed(None):
-            NeuronEngine.install(None)
+            NeuronEngine.install(version)    # interpret version as version of NEURON!
             inform("%s installed NEURON..." % PyNRNEngine.name, indent=2, verbosity =1)
 
         environment_vars_nrn, path_nrn = NeuronEngine.get_nrn_environment()
@@ -43,7 +56,7 @@ class PyNRNEngine(NeuronEngine):
     def run(self):
         
         try:
-            self.stdout = self.compile_modfiles()
+            self.stdout = NeuronEngine.compile_modfiles(self.modelpath)
         except sp.CalledProcessError as err:
             self.stderr = err.output
             self.returncode = err.returncode
@@ -58,18 +71,22 @@ class PyNRNEngine(NeuronEngine):
             cmd = '''\
             %s
             ''' % ('\n'.join(self.extra_pars))
-            stdout, stderr = p.communicate(dedent(cmd))
+            if sys.version_info[0]==3:
+                c = dedent(cmd).encode()
+            else:
+                c = dedent(cmd)
+            stdout, stderr = p.communicate(c)
             # with open('/tmp/omv_test.nrn.stdout', 'w') as f:
             #     f.write(stdout)
-            self.stdout = stdout
-            self.stderr = stderr
+            self.stdout = str(stdout.decode())
+            self.stderr = str(stderr.decode())
             
-            inform("OUT: ", stdout, verbosity=1, indent=2)
-            inform("ERR: ", stderr, verbosity=1, indent=2)
-            inform("returncode: ", p.returncode, verbosity=1, indent=2)
+            inform("OUT: %s"% self.stdout, verbosity=1, indent=2)
+            inform("ERR: %s"% self.stderr, verbosity=1, indent=2)
+            inform("returncode: [%s]"% p.returncode, verbosity=1, indent=2)
 
             self.returncode = p.returncode
-            if self.returncode is not 0:
+            if self.returncode != 0:
                 raise EngineExecutionError
 
 

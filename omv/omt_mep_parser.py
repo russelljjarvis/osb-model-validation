@@ -1,6 +1,6 @@
-from experiment import OMVExperiment
+from omv.experiment import OMVExperiment
 from os.path import join, dirname
-from common.inout import load_yaml
+from omv.common.inout import load_yaml
 
 
 class OMVParseError(BaseException):
@@ -39,7 +39,7 @@ class OMVTestParser(object):
 
     def generate_exps(self, engine):
         if self.mep:
-            for expname, exp in self.omt_experiments.iteritems():
+            for expname, exp in self.omt_experiments.items():
                 expmep = self.mep_experiments[expname]
                 obs = exp['observables']
                 yield OMVExperiment(expname, expmep, obs,

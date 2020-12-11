@@ -1,16 +1,17 @@
 import os
 import subprocess as sp
 
-from brian1 import Brian1Engine
-from pynn import PyNNEngine
+from omv.engines.brian1 import Brian1Engine
+from omv.engines.pynn import PyNNEngine
 
-from ..common.inout import inform, trim_path, check_output, is_verbose
-from engine import EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output, is_verbose
+from omv.engines.engine import EngineExecutionError
 
 
 class PyNNBrian1Engine(PyNNEngine):
     
     name = "PyNN_Brian1"
+    python3_compatible = Brian1Engine.python3_compatible
 
     @staticmethod
     def is_installed(version):
@@ -22,7 +23,7 @@ class PyNNBrian1Engine(PyNNEngine):
     @staticmethod
     def install(version):
         if not Brian1Engine.is_installed(None):
-            Brian1Engine.install(None)
+            Brian1Engine.install(version)  # interpret version as version of Brian!
             inform("%s installed Brian..." % PyNNBrian1Engine.name, indent=2, verbosity =1)
         if not PyNNEngine.is_installed(None):
             PyNNEngine.install(None)

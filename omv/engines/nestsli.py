@@ -1,8 +1,8 @@
 import os
 import subprocess as sp
 
-from ..common.inout import inform, trim_path, check_output, is_verbose
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
 
 class NestEngine(OMVEngine):
@@ -14,7 +14,7 @@ class NestEngine(OMVEngine):
     def get_nest_environment():
 
         nestpath = os.path.join(os.environ['HOME'],'nest/nest/')
-        if os.environ.has_key('NEST_INSTALL_DIR'):
+        if 'NEST_INSTALL_DIR' in os.environ:
             nestpath = os.environ['NEST_INSTALL_DIR']+'/'
 
         environment_vars = {'NEST_HOME': nestpath,
@@ -28,11 +28,17 @@ class NestEngine(OMVEngine):
         ret = True
 
         environment_vars = NestEngine.get_nest_environment()
-
         try:
             FNULL = open(os.devnull, 'w')
 
-            check_output([environment_vars['NEST_HOME']+'bin/nest', '-v'], verbosity=is_verbose())
+            r = check_output([environment_vars['NEST_HOME']+'bin/nest', '-v'], verbosity=2)
+    
+            ret = '%s'%r.split('version')[1].split()[0][:-1]
+            if '-' in ret:
+                ret = 'v%s'%ret.split('-')[-1]
+                
+            inform("NEST %s is correctly installed..." % ret, indent=2, verbosity=1)
+            
         except OSError as err:
             inform("Couldn't execute NEST: ", err, indent=1)
             ret = False
@@ -42,8 +48,8 @@ class NestEngine(OMVEngine):
     @staticmethod
     def install(version):
 
-        from getnest import install_nest
-        install_nest()
+        from omv.engines.getnest import install_nest
+        install_nest(version)
         inform('Done...', indent=2)
 
 

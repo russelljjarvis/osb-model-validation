@@ -1,0 +1,34 @@
+system: Test
+
+experiments:
+    spikeGenRegular50:
+        expected:
+            spike times: [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4]
+    spikeGenRegular50_rate:
+        expected:
+            spike rate: 20
+    spikeGenRegular_rate_all:
+        expected:
+            spike rate: 110
+    spikeGenRegular5_rate:
+        expected:
+            spike rate: 200
+
+    spike_iaf0:
+        expected:
+            spike rate: 196.23233909252195
+    spike_iaf1_isi:
+        expected:
+            spike rate: 90.1631953860354
+    spike_iaf1_durA:
+        expected:
+            spike rate: 43.90243902439025
+    spike_iaf1_durB:
+        expected:
+            spike rate: 90
+    spike_iaf2:
+        expected:
+            spike rate: 0
+    spike_iaf_all:
+        expected:
+            spike rate: 143.19776723927868

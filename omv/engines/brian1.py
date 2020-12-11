@@ -1,21 +1,25 @@
 import os
 import subprocess as sp
 
-from ..common.inout import inform, trim_path, check_output, is_verbose
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output, is_verbose
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
 
 class Brian1Engine(OMVEngine):
     
     name = "Brian"
+    
+    python3_compatible = False
 
     @staticmethod
     def is_installed(version):
-        ret = True
+        ret = False
         try:
             import brian
             if is_verbose():
                 inform("Brian version %s is correctly installed..." % brian.__version__, indent=2)
+                
+            ret = 'v%s'%brian.__version__
             
         except Exception as err:
             inform("Couldn't import Brian into Python: ", err, indent=1)
@@ -24,7 +28,7 @@ class Brian1Engine(OMVEngine):
         
     @staticmethod
     def install(version):
-        from getbrian1 import install_brian
+        from omv.engines.getbrian1 import install_brian
         home = os.environ['HOME']
         inform('Will fetch and install the latest Brian (version 1.x)', indent=2)
         install_brian()

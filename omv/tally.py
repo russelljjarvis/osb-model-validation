@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from common.inout import trim_path
+from omv.common.inout import trim_path
 
 
 class Tallyman(object):
@@ -9,15 +9,20 @@ class Tallyman(object):
         self.engine = mepomt.engine
         self.modelpath = mepomt.modelpath
         self.experiments = {}
+        self.report_passing_if_no_exps = False
 
     def all_passed(self):
-        alltrue = True if any(self.experiments) else False
+        alltrue = True if any(self.experiments) else self.report_passing_if_no_exps
         for res in self.experiments.values():
             alltrue = alltrue and all(res.values())
         return alltrue
         
     def add_experiment(self, exp, results):
         self.experiments[exp.name] = results
+            
+    def __lt__(self, other):
+        if other.mep==None: return True
+        return self.omt < other.omt
 
     def serialize(self):
         s = OrderedDict({'engine': self.engine})
@@ -45,12 +50,12 @@ class TallyHolder(object):
             
         mp = trim_path(tally.modelpath)
         
-        if not self.tallies.has_key(mp):
+        if not mp in self.tallies:
             self.tallies[mp] = {}
         
         mptallies = self.tallies[mp]
         
-        if not mptallies.has_key(tally.engine):
+        if not tally.engine in mptallies:
             mptallies[tally.engine] = []
             
         mptallies[tally.engine].append(tally)
@@ -82,7 +87,7 @@ class TallyHolder(object):
             mptallies = self.tallies[mp]
             
             for engine in self.all_engines:
-                if not mptallies.has_key(engine):
+                if not engine in mptallies:
                     
                     info = "%s"%(' ')
                     summary += ' '*(len(engine)-len(info)-2)+info+" |   "

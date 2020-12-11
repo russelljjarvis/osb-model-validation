@@ -1,8 +1,8 @@
 import os
 import subprocess as sp
 
-from ..common.inout import inform, trim_path, check_output
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
 
 class OctaveEngine(OMVEngine):
@@ -15,7 +15,9 @@ class OctaveEngine(OMVEngine):
         ret = True
         
         try:
-            print(check_output(['octave', '-v']))
+            ret_str = check_output(['octave', '-v'], verbosity=1)
+            
+            ret = 'v%s'%str(ret_str).split()[3]
         except OSError as err:
             inform("Couldn't execute Octave!", err, indent=1)
             ret = False
@@ -23,7 +25,7 @@ class OctaveEngine(OMVEngine):
         
     @staticmethod
     def install(version):
-        from getoctave import install_octave
+        from omv.engines.getoctave import install_octave
         
         inform('Will fetch and install the latest Octave', indent=2)
         install_octave()

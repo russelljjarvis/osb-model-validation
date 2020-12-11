@@ -1,5 +1,5 @@
-import utils.timeseries as ts
-from ..common.inout import inform
+from omv.analyzers.utils.timeseries import *
+from omv.common.inout import inform
 
 
 class OMVAnalyzer(object):
@@ -24,7 +24,25 @@ class OMVAnalyzer(object):
         
         try:
             obs = self.parse_observable()
+            if obs is None:
+                    inform("Could not determine observed values")
+                    return False
+            if isinstance(obs, list):
+                for o in obs:
+                    if not o:
+                        inform("Could not determine observed values")
+                        return False
+                    
             exp = self.parse_expected()
+            
+            if exp is None:
+                    inform("Could not determine expected values, value None")
+                    return False
+            if isinstance(exp, list):
+                for e in exp:
+                    if not e:
+                        inform("Could not determine expected values")
+                        return False
         except IOError as e:
             inform("Input/output error when\
                    checking for observable data: %s" % e)
@@ -35,10 +53,10 @@ class OMVAnalyzer(object):
         except (TypeError, KeyError):  # observable can be None
             tolerance = 1e-1
 
-        are_close, best_tol = ts.compare_arrays((obs, exp), tolerance)
+        are_close, best_tol = compare_arrays((obs, exp), tolerance)
 
         if not are_close:
-	    pretty_obs, pretty_exp = ts.pretty_print_copypaste(obs,exp)
+            pretty_obs, pretty_exp = pretty_print_copypaste(obs,exp)
             inform("Comparison of \n\
                     (observed data): %s\n\
                     and\n\
@@ -49,5 +67,5 @@ class OMVAnalyzer(object):
                 inform("A better tolerance to try is: ", best_tol, indent=1)
         else:
             if best_tol and best_tol < tolerance:
-                inform("Passed, but an even better tolerance might be: %f, as opposed to: %f" % (best_tol, tolerance), indent=3, verbosity=1)
+                inform("Passed, but an even better tolerance might be: %s, as opposed to: %s (diff: %s)" % (best_tol, tolerance,(tolerance-best_tol)), indent=3, verbosity=1)
         return are_close

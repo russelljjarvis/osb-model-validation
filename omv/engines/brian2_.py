@@ -1,8 +1,8 @@
 import os
 import subprocess as sp
 
-from ..common.inout import inform, trim_path, check_output
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
 
 class Brian2Engine(OMVEngine):
@@ -14,20 +14,21 @@ class Brian2Engine(OMVEngine):
         ret = True
         try:
             import brian2
-            print brian2.__file__
-            inform("Brian2 version %s is correctly installed..." % brian2.__version__, indent=2)
+            inform("Brian2 version %s is correctly installed..." % brian2.__version__, indent=2, verbosity=2)
+            
+            ret = 'v%s'%brian2.__version__
             
         except Exception as err:
-            inform("Couldn't import Brian2 into Python: ", err, indent=1)
+            inform("Couldn't import Brian2 into Python: ", err, indent=1, verbosity=1)
             ret = False
         return ret
         
     @staticmethod
     def install(version):
-        from getbrian2 import install_brian2
+        from omv.engines.getbrian2 import install_brian2
         home = os.environ['HOME']
         inform('Will fetch and install the latest Brian (version 2.x)', indent=2)
-        install_brian2()
+        install_brian2(version)
         inform('Done...', indent=2)
         
     def run(self):

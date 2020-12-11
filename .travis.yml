@@ -1,46 +1,115 @@
+
+dist: xenial
 sudo: false
 
 addons:
   apt:
     packages:
        # Requirements for Brian & NEST
-    - python-numpy 
-    - python-scipy 
-    - python-matplotlib 
     - python-sympy
+    - python-tornado
+    - cython
         # Requirements for Octave
     - octave
+        # Requirements for NetPyNE & libNeuroML
+    - python-tk
+    - python-lxml
+        # Requirements for Moose
+    - python-dev
+    - libhdf5-dev
+    - libgsl0-dev 
+    - g++
     
     
 language: python
 
-python: 2.7
-
+python: 
+  - 2.7
+  #- "3.5"
+  # - "3.6"  see below
+  #- "3.7"
+  
+  
+# remove this for py3..?
 virtualenv:
     system_site_packages: true
 
+
 env:
-    - OMV_ENGINE=NEST
-    - OMV_ENGINE=PyNEST
-    - OMV_ENGINE=PyNN_Brian1
     - OMV_ENGINE=Brian
-    - OMV_ENGINE=Brian2
-    - OMV_ENGINE=PyNN_NEURON
-    - OMV_ENGINE=PyNEURON
-    - OMV_ENGINE=PyNN
-    - OMV_ENGINE=PyNN_Nest
+    - OMV_ENGINE=Brian2:2.2.2.1
+    - OMV_ENGINE=NEST:2.18.0
+    - OMV_ENGINE=NEST:2.20.0
+    - OMV_ENGINE=PyNEST
     - OMV_ENGINE=Octave
-    - OMV_ENGINE=jNeuroML
+    - OMV_ENGINE=genesis
+    - OMV_ENGINE=Moose
+    - OMV_ENGINE=NEURON:7.5
+    - OMV_ENGINE=PyNEURON:7.6
+    - OMV_ENGINE=PyNN
+    - OMV_ENGINE=PyNN_NEURON
+    - OMV_ENGINE=PyNN_Brian1
+    - OMV_ENGINE=PyNN_Nest
+    - OMV_ENGINE=PyNN_NeuroML
+    - OMV_ENGINE=NetPyNE
+    - OMV_ENGINE=PyLEMS
     - OMV_ENGINE=PyLEMS_NeuroML2
+    - OMV_ENGINE=jLEMS
+    - OMV_ENGINE=jNeuroML
+    - OMV_ENGINE=jNeuroML_Brian
+    - OMV_ENGINE=jNeuroML_Brian2
+    - OMV_ENGINE=jNeuroML_Moose
     - OMV_ENGINE=jNeuroML_NEURON
-    - OMV_ENGINE=jNeuroML_Brain
+    - OMV_ENGINE=jNeuroML_NetPyNE
+    - OMV_ENGINE=jNeuroML_PyNN_NEURON
+    - OMV_ENGINE=jNeuroML_validate
+    - OMV_ENGINE=jNeuroML_validatev1
+    - OMV_ENGINE=Py_neuroConstruct
+    - OMV_ENGINE=pyNeuroML
+    
+    - OMV_ENGINE=DIRECT_ENGINE_INSTALL
+
 
 install:
     - python setup.py install
+    - pip install matplotlib --upgrade # To ensure matplotlib 2.x
+    - pip install numpy scipy # Why is this needed? Scipy doesn't seem to get installed correctly on trusty with addons above...
+    - pip install bokeh==1.4.0 # for NetPyNE & py2...
 
 script:
-    - omv list-engines
+    - omv list-engines -V
     - cd utilities/tests
-    - omv all -V
-    - omv list-engines
+    
+    # Note --ignore-non-py3  --> doesn't install simulator or run tests or cause failure if simulator itself is not Python 3 compatible...
+    - omv all -V --ignore-non-py3; export OMV_SUCCESS=$?; echo $OMV_SUCCESS
+    
+    - omv list-engines -V
+    
+    - echo "Finished all OMV tests on *.omt files which have been found"
+    - if [[ ${OMV_ENGINE} == "DIRECT_ENGINE_INSTALL" ]]; then echo "Continuing..."; else exit $OMV_SUCCESS; fi
+    
+    - cd ../../omv/test
+    - nosetests -vs
+    - cd -
+    
+    - echo "Testing direct installation of some simulators..."
+    - omv install Brian2:2.2
+    - omv install PyNEURON:7.6
+    - omv install PyLEMS_NeuroML2
+    - omv install PyNEST
+    - omv install Brian2
+    
+    # Set NEST variables
+    - source $TRAVIS_HOME/nest/nest/bin/nest_vars.sh
+    
+    - omv list-engines -V
+    
+    - pwd
+    - python test_pynest.py
+    - python test_brian2.py
+    - which omv
+    - which python
+    - env
+
+    
 

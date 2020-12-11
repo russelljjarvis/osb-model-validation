@@ -1,10 +1,10 @@
 import os
 import subprocess as sp
 
-from ..common.inout import inform, trim_path, check_output, is_verbose
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output, is_verbose
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
-from nestsli import NestEngine
+from omv.engines.nestsli import NestEngine
 
 
 class PyNestEngine(OMVEngine):
@@ -18,19 +18,30 @@ class PyNestEngine(OMVEngine):
         
         ret = True
         try:
-            import nest
-            try:
-                version = nest.version()
-            except:
-                version = '???'
+            
+            ret_str = check_output(['python -c "import nest; print(nest.version())"'], shell=True, verbosity=2)
+            ret = len(ret_str) > 0
+            
+            if ret:
+                ret_str = ret_str.strip().split('\n')[-1]
+                #print('NEST info: %s; <<%s>>'%(ret, ret_str))
+                if 'Version' in ret_str:
+                    ret = 'v%s'%ret_str.split('Version')[-1].split()[0]
+                elif '-' in ret_str:
+                    ret = 'v%s'%ret_str.split('-')[-1].split()[0]
+                else:
+                    ret = 'v%s'%ret_str.split()[-1]
+            
+            if ret and is_verbose():
+                inform("%s is correctly installed..." % (PyNestEngine.name), indent=2)
             
             if is_verbose():
-                inform("NEST version: %s is installed with Python support..." 
-                    % version, indent=2)
+                inform("NEST is installed with Python support...", indent=2)
                 inform("Env vars: %s" % PyNestEngine.environment_vars, indent=2)
             
         except Exception as err:
             inform("Couldn't import NEST into Python: ", err, indent=1)
+            inform("NEST env vars: %s" % PyNestEngine.environment_vars, indent=1)
             ret = False
         return ret
         
@@ -50,8 +61,8 @@ class PyNestEngine(OMVEngine):
         inform("Env vars: %s" % self.environment_vars, indent=2)
         
         try:
-            inform("Running file %s with %s" % (trim_path(self.modelpath), self.name), indent=1)
-            self.stdout = check_output(['python', self.modelpath],
+            inform("Running the file %s with %s" % (trim_path(self.modelpath), self.name), indent=1)
+            self.stdout = check_output(['python', self.modelpath, '-nogui'],
                                           cwd=os.path.dirname(self.modelpath))
             self.returncode = 0
         except sp.CalledProcessError as err:

@@ -1,8 +1,8 @@
 import os
 import subprocess as sp
 
-from ..common.inout import inform, trim_path
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
 
 class JLemsEngine(OMVEngine):
@@ -13,15 +13,15 @@ class JLemsEngine(OMVEngine):
     def is_installed(version):
         ret = True
         try:
-            FNULL = open(os.devnull, 'w')
-            sp.check_call(['lems', '-h'], stdout=FNULL)
+            ret_str = check_output(['lems', '-h'], verbosity=1)
+            ret = 'v%s'%ret_str.split('-jar')[-1].split()[0].split('-')[1][:-4]
         except OSError as err:
             inform("Couldn't execute lems:", err, indent=1)
             ret = False
         return ret
         
     def install(self, version):
-        from getjlems import install_jlems
+        from omv.engines.getjlems import install_jlems
         home = os.environ['HOME']
         p = os.path.join(home, 'jLEMS')
         self.path = p

@@ -3,9 +3,9 @@ import os
 import subprocess as sp
 from tempfile import NamedTemporaryFile
 
-from engine import OMVEngine, EngineExecutionError
-from utils.wdir import working_dir
-from ..common.inout import inform
+from omv.engines.engine import OMVEngine, EngineExecutionError
+from omv.engines.utils.wdir import working_dir
+from omv.common.inout import inform
 
 
 class GenesisEngine(OMVEngine):
@@ -19,13 +19,17 @@ class GenesisEngine(OMVEngine):
         ret = True
         try:
             temp = NamedTemporaryFile(suffix='.g')
-            temp.writelines(['echo "version: "{version} \n', 'quit \n'])
+            temp.writelines([b'echo "version: "{version} \n', b'quit \n'])
             temp.seek(0)
             out = sp.check_output(
                 ['genesis', '-nox', '-batch', '-notty', temp.name])
-            m = re.search('version:' + '\s*([0-9]*\.?[0-9]+)\s*', out)
+            m = re.search(b'version:\s*([0-9]*\.?[0-9]+)\s*', out)
             if m:
-                ret = m.groups()[0]
+                ver = m.groups()[0]
+
+                if isinstance(ver, bytes):
+                    ver = ver.decode('utf-8')
+                ret = 'v%s'%ver
                 inform("Found GENESIS in path, version %s" % ret,
                         verbosity=1, indent=2)
         except OSError:
@@ -37,12 +41,12 @@ class GenesisEngine(OMVEngine):
 
     @classmethod
     def install(cls, engine_version):
-        import getgenesis
+        from omv.engines.getgenesis import install_genesis
         home = os.environ['HOME']
         cls.path = os.path.join(home, 'genesis',
                                 'genesis2.4gamma-master', 'src')
         inform('Will fetch and install genesis-2.4', indent=1)
-        getgenesis.install_genesis()
+        install_genesis()
 
     def run(self):
         from pkg_resources import resource_filename

@@ -1,8 +1,8 @@
 import os
 import subprocess as sp
 
-from ..common.inout import inform, trim_path, check_output, is_verbose
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output, is_verbose
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
 
 class PyNNEngine(OMVEngine):
@@ -13,18 +13,25 @@ class PyNNEngine(OMVEngine):
     def is_installed(version):
         ret = True
         try:
-            import pyNN
+            
+            ret_str = sp.check_output(['python -c "import pyNN; print(pyNN.__version__)"'], shell=True,stderr=sp.STDOUT)
+            ret = len(ret_str) > 0
+            
+            if isinstance(ret_str, bytes):
+                ret_str = ret_str.decode('utf-8')
+            
+            ret = 'v%s'%ret_str.strip()
             if is_verbose():
-                inform("pyNN version %s is correctly installed..." % pyNN.__version__, indent=2)
+                inform("pyNN %s is correctly installed..." % ret, indent=2, verbosity=2)
             
         except Exception as err:
-            inform("Couldn't import pyNN into Python: ", err, indent=1)
+            inform("Couldn't import pyNN into Python: ", err, indent=1, verbosity=2)
             ret = False
         return ret
         
     @staticmethod
     def install(version):
-        from getpynn import install_pynn
+        from omv.engines.getpynn import install_pynn
         home = os.environ['HOME']
         inform('Will fetch and install the latest pyNN', indent=2)
         install_pynn()

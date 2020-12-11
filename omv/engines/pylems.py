@@ -1,8 +1,9 @@
 import os
 import subprocess as sp
+import sys
 
-from ..common.inout import inform, trim_path
-from engine import OMVEngine, EngineExecutionError
+from omv.common.inout import inform, trim_path, check_output, is_verbose
+from omv.engines.engine import OMVEngine, EngineExecutionError
 
 
 class PyLemsEngine(OMVEngine):
@@ -13,16 +14,18 @@ class PyLemsEngine(OMVEngine):
     def is_installed(version):
         ret = True
         try:
-            FNULL = open(os.devnull, 'w')
-            sp.check_call(['pylems', '-h'], stdout=FNULL)
+            import lems
+            ret = 'v%s'%lems.__version__
+            inform("PyLEMS %s is correctly installed..." % ret, indent=2, verbosity=2)
+
         except Exception as err:
-            inform("Couldn't execute PyLEMS: ", err, indent=1)
+            inform("Couldn't execute/import PyLEMS: ", err, indent=1)
             ret = False
         return ret
         
     @staticmethod
     def install(version):
-        from getpylems import install_pylems
+        from omv.engines.getpylems import install_pylems
         home = os.environ['HOME']
         p = os.path.join(home, 'pylems')
         PyLemsEngine.path = p
@@ -34,12 +37,12 @@ class PyLemsEngine(OMVEngine):
     def run(self):
         try:
             inform("Running file %s with %s" % (trim_path(self.modelpath), self.name), indent=1)
-            self.stdout = sp.check_output(['pylems', self.modelpath, '-nogui'],
+            self.stdout = check_output(['pylems', self.modelpath, '-nogui'],
                                           cwd=os.path.dirname(self.modelpath))
             self.returncode = 0
         except sp.CalledProcessError as err:
+            inform("Process error with %s: "%self.name, err, indent=1)
             self.returncode = err.returncode
-            self.stdout = err.output
             raise EngineExecutionError
         except Exception as err:
             inform("Another error with running %s: "%self.name, err, indent=1)

@@ -1,0 +1,91 @@
+# Script for running automated tests on OSB using Travis-CI, see https://github.com/OpenSourceBrain/osb-model-validation
+ 
+target: LEMS_Tests.xml 
+engine: jNeuroML
+mep: .test.tests.mep
+experiments:
+    
+  spikeGenRegular50:
+    observables:
+      spike times:
+        spiketimes file: 
+          path: regular.all.spikes
+          format: ID_TIME
+          ids: 0
+        tolerance: 3.4e-6
+        
+  spikeGenRegular50_rate:
+    observables:
+      spike rate:
+        spiketimes file: 
+          path: regular.all.spikes
+          format: ID_TIME
+          ids: 0
+        tolerance: 3.4e-6
+
+  spikeGenRegular_rate_all:
+    observables:
+      spike rate:
+        spiketimes file: 
+          path: regular.all.spikes
+          format: ID_TIME
+          ids: '*'
+        tolerance: 3.4e-6
+
+  spikeGenRegular5_rate:
+    observables:
+      spike rate:
+        spiketimes file: 
+          path: regular.all.spikes
+          format: ID_TIME
+          ids: 1
+        tolerance: 2.5640959896122696e-06
+
+  spike_iaf0:
+    observables:
+      spike rate:
+        spiketimes file: 
+          path: iafs.spikes
+          format: ID_TIME
+          ids: 0
+        tolerance: 0
+  spike_iaf1_isi:
+    observables:
+      spike rate:
+        spiketimes file: 
+          path: iafs.spikes
+          format: ID_TIME
+          ids: 1
+        method: isi based
+        tolerance: 0
+  spike_iaf1_durA:
+    observables:
+      spike rate:
+        spiketimes file: 
+          path: iafs.spikes
+          format: ID_TIME
+          ids: 1
+        method: duration based
+        start_time: 0
+        end_time: 0.410
+        tolerance: 0
+  spike_iaf1_durB:
+    observables:
+      spike rate:
+        spiketimes file: 
+          path: iafs.spikes
+          format: ID_TIME
+          ids: 1
+        method: duration based
+        start_time: 0.2
+        end_time: 0.4
+        tolerance: 0
+  spike_iaf2:
+    observables:
+      spike rate:
+        spiketimes file: 
+          path: iafs.spikes
+          format: ID_TIME
+          ids: 2
+        tolerance: 0
+
