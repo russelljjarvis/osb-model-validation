@@ -34,10 +34,10 @@ from omv.engines.netpyne__np4 import NetPyNENP4Engine
 from omv.engines.netpyne__np2 import NetPyNENP2Engine
 from omv.engines.pyneuroconstruct import PyneuroConstructEngine
 from omv.engines.pyneuroml_ import PyNeuroMLEngine
+from omv.engines.numba import NumbaEngine
 
 
 OMVEngines = {be.name: be for be in locals().values()
               if inspect.isclass(be)
               and issubclass(be, OMVEngine)
               and not be.name == 'Name not yet set!'}
-
