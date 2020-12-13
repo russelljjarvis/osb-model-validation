@@ -10,21 +10,20 @@ def install_numba():
 
         install_root = os.environ['HOME']
 
-        pyNN_src = 'PyNN_src'
+        numba_src = 'numba_src'
         with working_dir(install_root):
-            check_output(['git', 'clone', 'https://github.com/NeuralEnsemble/PyNN.git', pyNN_src])
+            check_output(['git', 'clone', 'https://github.com/russelljjarvis/jit_hub', numba_src])
 
-        path = os.path.join(install_root, pyNN_src)
+        path = os.path.join(install_root, numba_src)
 
         with working_dir(path):
-            print(check_output(['git','checkout','neuroml']))  # neuroml branch has the latest NML2 import/export code!
-            #check_output(['git','checkout','master'])
+            print(check_output(['git','checkout','main']))  # neuroml branch has the latest NML2 import/export code!
             print(check_output(['python', 'setup.py', 'install']))
             print(check_output(['pwd']))
-            print("Finished attempting to install PyNN")
-        #import pyNN
-        m = 'Successfully installed pyNN...'
+            print("Finished attempting to install numba jithub")
+        import jithub
+        m = 'Successfully installed numba jithub...'
     except Exception as e:
-        m = 'ERROR during install_pynn: %s'%e
+        m = 'ERROR during install jithub: %s'%e
     finally:
         inform(m)
